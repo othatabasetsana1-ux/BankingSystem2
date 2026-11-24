@@ -49,6 +49,7 @@ public class LoginView {
             }
         });
 
+        //noinspection ConstantConditions
         registerBtn.setOnAction(e -> {
             RegisterView register = new RegisterView();
             stage.setScene(register.getScene(stage));
