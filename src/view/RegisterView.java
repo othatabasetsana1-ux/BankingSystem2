@@ -26,6 +26,7 @@ public class RegisterView {
         companyBtn.setToggleGroup(typeGroup);
         individualBtn.setSelected(true);
 
+        // Common fields
         TextField idField = new TextField(); idField.setPromptText("Customer ID (e.g. IND001)");
         TextField name1 = new TextField(); name1.setPromptText("First name / Company name");
         TextField name2 = new TextField(); name2.setPromptText("Surname / Registration No");
@@ -33,6 +34,15 @@ public class RegisterView {
         TextField phone = new TextField(); phone.setPromptText("Phone");
         TextField email = new TextField(); email.setPromptText("Email");
         PasswordField pass = new PasswordField(); pass.setPromptText("Password");
+
+        // Individual-specific fields
+        Label individualLabel = new Label("Individual Customer Details:");
+        individualLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2E86C1;");
+        TextField dobField = new TextField(); dobField.setPromptText("Date of Birth (YYYY-MM-DD)");
+        TextField nationalIdField = new TextField(); nationalIdField.setPromptText("National ID (9 digits)");
+        TextField occupationField = new TextField(); occupationField.setPromptText("Occupation");
+        TextField employerField = new TextField(); employerField.setPromptText("Employer name");
+        TextField employerAddrField = new TextField(); employerAddrField.setPromptText("Employer address");
 
         Button submit = new Button("Register");
         Button back = new Button("Back to Login");
@@ -43,9 +53,20 @@ public class RegisterView {
             if (id.isEmpty()) { status.setText("Enter customer ID"); return; }
             boolean ok;
             if (individualBtn.isSelected()) {
-                ok = regController.registerIndividual(id, name1.getText(), name2.getText(),
-                        "", "", "", "", "", address.getText(), phone.getText(),
-                        email.getText(), pass.getText());
+                ok = regController.registerIndividual(
+                        id,
+                        name1.getText(),
+                        name2.getText(),
+                        dobField.getText(),
+                        nationalIdField.getText(),
+                        occupationField.getText(),
+                        employerField.getText(),
+                        employerAddrField.getText(),
+                        address.getText(),
+                        phone.getText(),
+                        email.getText(),
+                        pass.getText()
+                );
             } else {
                 ok = regController.registerCompany(id, name1.getText(), name2.getText(),
                         "", "", "", address.getText(), phone.getText(),
@@ -66,7 +87,10 @@ public class RegisterView {
         });
 
         root.getChildren().addAll(title, individualBtn, companyBtn,
-                idField, name1, name2, address, phone, email, pass, submit, back, status);
-        return new Scene(root, 400, 600);
+                idField, name1, name2, address, phone, email, pass,
+                individualLabel, dobField, nationalIdField, occupationField,
+                employerField, employerAddrField,
+                submit, back, status);
+        return new Scene(root, 450, 750);
     }
 }
