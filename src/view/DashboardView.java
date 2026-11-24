@@ -28,6 +28,7 @@ public class DashboardView {
         Label welcome = new Label("Welcome, " + customer.getFullName() + " (ID: " + customer.getCustomerId() + ")");
         welcome.setStyle("-fx-font-size: 16px; -fx-font-weight: bold;");
 
+        // Open account section
         Label openTitle = new Label("Open New Account:");
         HBox openRow = new HBox(10);
         TextField accNoField = new TextField(); accNoField.setPromptText("Account #");
@@ -60,6 +61,7 @@ public class DashboardView {
             refreshAccounts();
         });
 
+        // Transaction section
         Label transTitle = new Label("Deposit / Withdraw:");
         HBox transRow = new HBox(10);
         TextField amountField = new TextField(); amountField.setPromptText("Amount");
@@ -75,7 +77,7 @@ public class DashboardView {
             try {
                 double amt = Double.parseDouble(amountField.getText());
                 boolean ok = accountController.deposit(selected, amt);
-                output.setText(ok ? "Deposited BWP " + amt + "\nNew balance: BWP " + selected.getBalance() : "Deposit failed");
+                output.setText(ok ? "Deposited BWP " + amt + "\nNew balance: BWP " + selected.getBalance() : "Deposit failed (account may be frozen/closed)");
             } catch (NumberFormatException ex) {
                 output.setText("Invalid amount");
             }
@@ -88,7 +90,7 @@ public class DashboardView {
             try {
                 double amt = Double.parseDouble(amountField.getText());
                 boolean ok = accountController.withdraw(selected, amt);
-                output.setText(ok ? "Withdrew BWP " + amt + "\nNew balance: BWP " + selected.getBalance() : "Withdrawal failed");
+                output.setText(ok ? "Withdrew BWP " + amt + "\nNew balance: BWP " + selected.getBalance() : "Withdrawal failed (check status/type/balance)");
             } catch (NumberFormatException ex) {
                 output.setText("Invalid amount");
             }
@@ -120,17 +122,68 @@ public class DashboardView {
             refreshAccounts();
         });
 
+        // NEW: Account status section
+        Label statusTitle = new Label("Account Status Management:");
+        HBox statusRow = new HBox(10);
+        Button freezeBtn = new Button("Freeze");
+        Button unfreezeBtn = new Button("Unfreeze");
+        Button lockBtn = new Button("Lock");
+        Button unlockBtn = new Button("Unlock");
+        Button closeBtn = new Button("Close Account");
+        statusRow.getChildren().addAll(freezeBtn, unfreezeBtn, lockBtn, unlockBtn, closeBtn);
+
+        freezeBtn.setOnAction(e -> {
+            Account selected = getSelectedAccount();
+            if (selected == null) { output.setText("Select an account first"); return; }
+            boolean ok = accountController.freezeAccount(selected);
+            output.setText(ok ? "Account FROZEN. No deposits or withdrawals allowed." : "Failed to freeze account");
+            refreshAccounts();
+        });
+
+        unfreezeBtn.setOnAction(e -> {
+            Account selected = getSelectedAccount();
+            if (selected == null) { output.setText("Select an account first"); return; }
+            boolean ok = accountController.unfreezeAccount(selected);
+            output.setText(ok ? "Account unfrozen. Back to ACTIVE." : "Failed to unfreeze account");
+            refreshAccounts();
+        });
+
+        lockBtn.setOnAction(e -> {
+            Account selected = getSelectedAccount();
+            if (selected == null) { output.setText("Select an account first"); return; }
+            boolean ok = accountController.lockAccount(selected);
+            output.setText(ok ? "Account LOCKED. No withdrawals (deposits still allowed)." : "Failed to lock account");
+            refreshAccounts();
+        });
+
+        unlockBtn.setOnAction(e -> {
+            Account selected = getSelectedAccount();
+            if (selected == null) { output.setText("Select an account first"); return; }
+            boolean ok = accountController.unlockAccount(selected);
+            output.setText(ok ? "Account unlocked. Back to ACTIVE." : "Failed to unlock account");
+            refreshAccounts();
+        });
+
+        closeBtn.setOnAction(e -> {
+            Account selected = getSelectedAccount();
+            if (selected == null) { output.setText("Select an account first"); return; }
+            boolean ok = accountController.closeAccount(selected);
+            output.setText(ok ? "Account CLOSED permanently." : "Failed to close (balance must be 0)");
+            refreshAccounts();
+        });
+
         Button logout = new Button("Logout");
         logout.setOnAction(e -> {
             LoginView login = new LoginView();
             stage.setScene(login.getScene(stage));
         });
 
-        output.setPrefHeight(150);
+        output.setPrefHeight(100);
 
         root.getChildren().addAll(welcome, openTitle, openRow, transTitle, transRow,
+                statusTitle, statusRow,
                 new Label("Your Accounts:"), accountList, output, logout);
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 900, 650);
         refreshAccounts();
         return scene;
     }

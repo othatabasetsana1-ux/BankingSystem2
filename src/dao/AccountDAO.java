@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public class AccountDAO {
 
     public boolean insert(Account a) {
-        String sql = "INSERT INTO account VALUES (?,?,?,?,?)";
+        String sql = "INSERT INTO account VALUES (?,?,?,?,?,?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement p = conn.prepareStatement(sql)) {
             p.setString(1, a.getAccountNumber());
@@ -15,6 +15,7 @@ public class AccountDAO {
             p.setDouble(3, a.getBalance());
             p.setDate(4, Date.valueOf(a.getDateOpened()));
             p.setString(5, a.getCustomer().getCustomerId());
+            p.setString(6, a.getStatus().name());
             return p.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Insert account failed: " + e.getMessage());
@@ -31,6 +32,19 @@ public class AccountDAO {
             return p.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Update balance failed: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateStatus(Account a) {
+        String sql = "UPDATE account SET status = ? WHERE account_number = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement p = conn.prepareStatement(sql)) {
+            p.setString(1, a.getStatus().name());
+            p.setString(2, a.getAccountNumber());
+            return p.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("Update status failed: " + e.getMessage());
             return false;
         }
     }

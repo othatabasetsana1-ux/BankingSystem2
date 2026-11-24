@@ -1,10 +1,5 @@
 package banking.model;
 
-/**
- * Cheque account: for employed individual customers AND company customers.
- * Allows deposits and withdrawals of any amount.
- * No interest is paid on cheque accounts.
- */
 public class ChequeAccount extends Account implements Withdrawable {
     private String employerName;
     private String employerAddress;
@@ -17,13 +12,10 @@ public class ChequeAccount extends Account implements Withdrawable {
         this.employerAddress = employerAddress;
     }
 
-    @Override
-    public String getAccountType() {
-        return "CHEQUE";
-    }
+    public String getAccountType() { return "CHEQUE"; }
 
-    @Override
     public boolean withdraw(double amount) {
+        if (!canWithdraw()) return false;
         if (amount <= 0) {
             System.out.println("Withdrawal denied: amount must be positive.");
             return false;
@@ -52,5 +44,4 @@ public class ChequeAccount extends Account implements Withdrawable {
 
     public String getEmployerName() { return employerName; }
     public String getEmployerAddress() { return employerAddress; }
-    public Company getVerifiedBy() { return verifiedBy; }
 }
